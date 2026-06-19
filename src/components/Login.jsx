@@ -11,6 +11,7 @@ const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const name = useRef(null);
   const email = useRef(null);
@@ -120,12 +121,23 @@ const Login = () => {
           placeholder="Email"
           className="p-4 my-4 bg-gray-800 w-full"
         />
-        <input
-          ref={password}
-          type="password"
-          placeholder="Password"
-          className="p-4 my-4 bg-gray-800 w-full"
-        />
+
+        <div className="relative w-full my-4">
+          <input
+            ref={password}
+            type={isPasswordVisible ? "text" : "password"}
+            placeholder="Password"
+            className="p-4 my-4 bg-gray-800 w-full rounded pr-12 text-white"
+          />
+
+          <button
+            type="button"
+            onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-xl select-none text-gray-400 hover:text-white"
+          >
+            {isPasswordVisible ? "👁️" : "🙈"}
+          </button>
+        </div>
 
         {errorMsg && <p className="text-red-500">{errorMsg}</p>}
         <button
