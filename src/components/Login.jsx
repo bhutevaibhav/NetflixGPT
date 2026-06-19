@@ -1,10 +1,16 @@
 import { useRef, useState } from "react";
 import Header from "./Header";
 import { checkValidData } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const name = useRef(null);
   const email = useRef(null);
@@ -32,17 +38,48 @@ const Login = () => {
       nameValue,
       isSignInForm,
     );
-
-    console.log("Form values:", {
-      email: emailValue,
-      password: passwordValue,
-      name: nameValue,
-      isSignInForm,
-    });
-
-    console.log("Validation message:", message);
-
     setErrorMsg(message);
+
+    if (message) return;
+    setIsLoading(true);
+    if (!isSignInForm) {
+      // sign up logic
+      createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log("User created:", user);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          setErrorMsg(error.message);
+          console.error("Error creating user:", error);
+          setIsLoading(false);
+        })
+        .finally(() => {
+          setIsLoading(false);
+          email.current.value = "";
+          password.current.value = "";
+          if (name.current) name.current.value = "";
+        });
+    } else {
+      // sign in logic
+      signInWithEmailAndPassword(auth, emailValue, passwordValue)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log("User signed in:", user);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          setErrorMsg(error.message);
+          console.error("Error signing in:", error);
+          setIsLoading(false);
+        })
+        .finally(() => {
+          setIsLoading(false);
+          email.current.value = "";
+          password.current.value = "";
+        });
+    }
   };
 
   const toggleSignInform = () => {
@@ -93,9 +130,14 @@ const Login = () => {
         {errorMsg && <p className="text-red-500">{errorMsg}</p>}
         <button
           type="submit"
-          className="p-3 my-6 w-full bg-red-600 text-white cursor-pointer"
+          disabled={isLoading}
+          className={`p-3 my-6 w-full text-white font-semibold rounded ${
+            isLoading
+              ? "bg-red-800 opacity-50 cursor-not-allowed"
+              : "bg-red-600 cursor-pointer hover:bg-red-700"
+          }`}
         >
-          {isSignInForm ? "Sign In" : "Sign Up"}
+          {isLoading ? "Loading..." : isSignInForm ? "Sign In" : "Sign Up"}
         </button>
         {isSignInForm ? (
           <p>

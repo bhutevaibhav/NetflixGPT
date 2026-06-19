@@ -9,7 +9,7 @@ export const checkValidData = (email, password, name, isSignInForm) => {
     }
   }
 
-  if (password.length < 4 || password.length > 7) {
+  if (password.length < 4 || password.length > 18) {
     return "Password must be between 4 and 7 characters";
     // console.log("Password must be between 4 and 7 characters");
   }
