@@ -6,6 +6,7 @@ import Login from "./Login";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { addUser, removeUser } from "../store/userSlice";
+import ProtectedRoutes from "../routes/ProtectedRoutes";
 
 const Body = () => {
   const dispatch = useDispatch();
@@ -16,7 +17,11 @@ const Body = () => {
     },
     {
       path: "/browse",
-      element: <Browse />,
+      element: (
+        <ProtectedRoutes>
+          <Browse />
+        </ProtectedRoutes>
+      ),
     },
   ]);
 
